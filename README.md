@@ -39,8 +39,8 @@ A real-time hand gesture recognition system that lets you control your desktop u
 | Fingers Up | Action |
 |-----------|--------|
 | 0 (Fist) | Play / Pause |
-| 2 fingers | Previous Tab |
-| 3 fingers | Next Tab |
+| 1 fingers | Previous Tab |
+| 2 fingers | Next Tab |
 | 5 (Open Palm) | Volume Up |
 
 ---
