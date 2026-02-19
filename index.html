@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Gesture Control System</title>
+  <link rel="stylesheet" href="/static/style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.6.1/socket.io.min.js"></script>
+</head>
+<body>
+  <div class="sidebar">
+    <div class="logo">
+      <span class="logo-icon">👾</span>
+      <span class="logo-text">GestureOS</span>
+    </div>
+    <nav>
+      <a href="#" class="nav-item active" onclick="showSection('dashboard', this)">Dashboard</a>
+      <a href="#" class="nav-item" onclick="showSection('gestures', this)">Gestures</a>
+      <a href="#" class="nav-item" onclick="showSection('actions', this)">Actions</a>
+    </nav>
+    <div class="sidebar-status">
+      <div class="status-dot" id="statusDot"></div>
+      <span id="statusLabel">System Stopped</span>
+    </div>
+  </div>
+
+  <div class="main">
+
+    <!-- DASHBOARD -->
+    <div id="section-dashboard" class="section active">
+      <div class="page-header">
+        <h1>Dashboard</h1>
+        <p>Monitor and control your gesture recognition system</p>
+      </div>
+
+      <div class="cards-row">
+        <div class="card">
+          <div class="card-label">System Status</div>
+          <div class="card-value" id="cardStatus">Stopped</div>
+        </div>
+        <div class="card">
+          <div class="card-label">Last Gesture</div>
+          <div class="card-value" id="cardGesture">—</div>
+        </div>
+        <div class="card">
+          <div class="card-label">Last Action</div>
+          <div class="card-value" id="cardAction">—</div>
+        </div>
+        <div class="card">
+          <div class="card-label">Total Gestures</div>
+          <div class="card-value" id="cardTotal">—</div>
+        </div>
+      </div>
+
+      <div class="camera-section">
+        <div class="camera-header">
+          <div class="camera-title"> Live Camera <span class="live-badge">LIVE</span></div>
+          <div class="camera-fps" id="cameraFps">— fps</div>
+        </div>
+        <div class="camera-wrapper">
+          <video id="cameraFeed" autoplay playsinline muted></video>
+          <canvas id="handCanvas"></canvas>
+          <div class="camera-overlay">
+            <div class="scan-line"></div>
+          </div>
+          <div class="camera-corner tl"></div>
+          <div class="camera-corner tr"></div>
+          <div class="camera-corner bl"></div>
+          <div class="camera-corner br"></div>
+        </div>
+      </div>
+
+      <div class="controls-row">
+        <button class="btn btn-green" onclick="startEngine()">▶ Start Recognition</button>
+        <button class="btn btn-red" onclick="stopEngine()">■ Stop</button>
+        <button class="btn btn-blue" onclick="retrain()">⟳ Retrain Model</button>
+      </div>
+
+      <div class="log-box">
+        <div class="log-header">Live Activity Log</div>
+        <div id="logFeed" class="log-feed">
+          <div class="log-entry">System ready. Press Start to begin.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- GESTURES -->
+    <div id="section-gestures" class="section">
+      <div class="page-header">
+        <h1>Gesture Library</h1>
+        <p>Add, view, and remove your custom gestures</p>
+      </div>
+
+      <div class="add-gesture-form">
+        <h2>Add New Gesture</h2>
+        <div class="form-row">
+          <input type="text" id="gestureName" placeholder="Gesture name (e.g. Thumbs Up)" />
+          <select id="gestureAction">
+            <option value="prev_tab">Previous Tab</option>
+            <option value="next_tab">Next Tab</option>
+            <option value="media_pause">Play / Pause</option>
+            <option value="volume_up">Volume Up</option>
+            <option value="volume_down">Volume Down</option>
+            <option value="next_track">Next Track</option>
+            <option value="prev_track">Previous Track</option>
+          </select>
+          <input type="text" id="gestureDesc" placeholder="Description (optional)" />
+        </div>
+        <div class="form-buttons">
+          <button class="btn btn-blue" onclick="recordGesture()">⏺ Record Gesture</button>
+          <button class="btn btn-green" onclick="addGesture()">+ Add</button>
+        </div>
+        <div id="recordStatus" class="record-status" style="display:none;">
+          <div class="record-countdown">Hold your gesture in front of the camera... <span id="countdownNum">3</span>s</div>
+          <div id="recordResult" class="record-result"></div>
+        </div>
+      </div>
+
+      <div id="gestureList" class="gesture-list"></div>
+    </div>
+
+    <!-- ACTIONS -->
+    <div id="section-actions" class="section">
+      <div class="page-header">
+        <h1>Action Reference</h1>
+        <p>All supported desktop actions</p>
+      </div>
+      <div class="action-grid">
+        <div class="action-card"><div class="action-icon">⇄</div><div class="action-name">Previous Tab</div><div class="action-key">⌘ + Shift + Tab</div></div>
+        <div class="action-card"><div class="action-icon">⇄</div><div class="action-name">Next Tab</div><div class="action-key">⌘ + Tab</div></div>
+        <div class="action-card"><div class="action-icon">⏯</div><div class="action-name">Play / Pause</div><div class="action-key">Space</div></div>
+        <div class="action-card"><div class="action-icon">🔊</div><div class="action-name">Volume Up</div><div class="action-key">+10 Volume</div></div>
+        <div class="action-card"><div class="action-icon">🔉</div><div class="action-name">Volume Down</div><div class="action-key">-10 Volume</div></div>
+        <div class="action-card"><div class="action-icon">⏭</div><div class="action-name">Next Track</div><div class="action-key">Music → Next</div></div>
+        <div class="action-card"><div class="action-icon">⏮</div><div class="action-name">Previous Track</div><div class="action-key">Music → Prev</div></div>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
