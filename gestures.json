@@ -1,0 +1,33 @@
+{
+  "gestures": [
+    {
+      "id": 1,
+      "name": "Swipe Left",
+      "action": "prev_tab",
+      "description": "Move to previous tab",
+      "fingers": "index"
+    },
+    {
+      "id": 2,
+      "name": "Swipe Right",
+      "action": "next_tab",
+      "description": "Move to next tab",
+      "fingers": "index+middle"
+    },
+    {
+      "id": 3,
+      "name": "Fist",
+      "action": "media_pause",
+      "description": "Pause or play media",
+      "fingers": "none"
+    },
+    {
+      "id": 4,
+      "name": "Open Palm",
+      "action": "volume_up",
+      "description": "Increase volume",
+      "fingers": "all"
+    }
+  ],
+  "next_id": 5
+}
